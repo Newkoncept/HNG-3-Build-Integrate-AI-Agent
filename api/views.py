@@ -30,8 +30,8 @@ class HomeAPIView(APIView):
         return Response(
             {
                 "a" : "Welcome",
-                "b" : request.data,
-                "c" : request.query_params,
+                # "b" : request.data,
+                # "c" : request.query_params,
                 # "format": formatted,
             }
             
