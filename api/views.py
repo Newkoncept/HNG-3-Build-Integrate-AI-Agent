@@ -1,14 +1,19 @@
 import logging, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
 
 # from .data import data
 
-logger = logging.getLogger("a2a")
-
+# logger = logging.getLogger("a2a")
+# @csrf_exempt
 class HomeAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
+        # print(request.query_params)
+        # print(request.data)
+        # print(json.loads(request.data))
+        # print(self.request.query_params)
 
         # raw = request.body.decode("utf-8", errors="replace")
 
@@ -22,10 +27,19 @@ class HomeAPIView(APIView):
         # print(data)
         # raw = json.loads(data["message"])
         # formatted = json.dumps(raw, indent=2, ensure_ascii=False)
-        raw = request.body.decode("utf-8", errors="replace")
-        logger.info("📩 Incoming Telex Request:\nHeaders=%s\nBody=%s",
-                    dict(request.headers), raw)
+        # raw = request.body.decode("utf-8", errors="replace")
+        # logger.info("📩 Incoming Telex Request:\nHeaders=%s\nBody=%s",
+        #             dict(request.headers), raw)
 
+        return Response(
+            {
+          "jsonrpc": '2.0',
+          "id": "b19bc59416f04c1fbcf90b8e35fbaad7",
+          "error": {
+            "code": -32600,
+            "message": 'Invalid Request: jsonrpc must be "2.0" and id is required'
+          }
+        }, 400)
 
         return Response(
             {
