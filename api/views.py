@@ -2,7 +2,7 @@ import logging, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .data import data
+# from .data import data
 
 logger = logging.getLogger("a2a")
 
