@@ -13,6 +13,8 @@ class HomeAPIView(APIView):
         # print(request.query_params)
         # print(request.data)
         # print(json.loads(request.data))
+
+        print(request.data["id"])
         # print(self.request.query_params)
 
         # raw = request.body.decode("utf-8", errors="replace")
@@ -34,7 +36,7 @@ class HomeAPIView(APIView):
         return Response(
             {
           "jsonrpc": '2.0',
-          "id": "b19bc59416f04c1fbcf90b8e35fbaad7",
+          "id": request.data["id"],
           "error": {
             "code": -32600,
             "message": 'Invalid Request: jsonrpc must be "2.0" and id is required'
