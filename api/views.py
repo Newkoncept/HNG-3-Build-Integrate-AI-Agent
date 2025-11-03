@@ -30,7 +30,7 @@ class HomeAPIView(APIView):
                         "messageId": randomUUID(),
                         "role": 'agent',
                         "parts": agent_response,
-                        "kind": 'task',
+                        "kind": 'message',
                         "taskId": randomUUID()
                     }
                 },
@@ -43,7 +43,8 @@ class HomeAPIView(APIView):
                         "parts": agent_response
                     }
                 ],
-                "history": request.data["params"]["message"]["parts"],
+                "history": [],
+                # "history": [request.data["params"]["message"]["parts"]],
                 "kind": 'task'
             }   
         }
