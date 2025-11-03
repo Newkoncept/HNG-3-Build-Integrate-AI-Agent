@@ -55,12 +55,7 @@ class HomeAPIView(APIView):
                     {
                         "artifactId": randomUUID(),
                         "name": 'deviceShield',
-                        "parts": [
-                            {
-                            "kind": "text",
-                            "text": agent_response,
-                            }
-                        ]
+                        "parts": agent_response
                     }
                 ],
                 "history": request.data["params"]["message"],
