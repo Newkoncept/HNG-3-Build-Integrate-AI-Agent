@@ -3,6 +3,8 @@ from uuid import uuid4
 import requests
 from datetime import datetime, date
 from typing import Optional, List, Any, Dict, Tuple
+from rest_framework.response import Response
+from rest_framework import status
 
 
 def randomUUID():
@@ -28,7 +30,7 @@ def online_data_grabber(keyword):
 
         return response.json()        
     except Exception as e:
-        return None, external_api_url
+        return None, e
     
 
 
@@ -76,18 +78,13 @@ def filter_last_5_years_from_back(data: dict) -> list[dict]:
     If keep_original_order is True, results are returned oldest->newest (as in the input).
     Otherwise, they are returned newest->oldest (as encountered walking backwards).
     """
+    
     vulns = data.get("vulnerabilities", [])
     if not vulns:
         return []
 
     cutoff_d = five_year_cutoff()
 
-
-
-    # print(cutoff_d)
-    # print(parse_nvd_datetime("2012-11-01T10:44:47.843") >= cutoff_d)
-
-    # """
     picked = []
 
     # iterate from the end; break as soon as we hit one older than cutoff
@@ -111,12 +108,7 @@ def filter_last_5_years_from_back(data: dict) -> list[dict]:
             # everything earlier will also be out-of-range → stop
             break
 
-    # restore input ordering if desired
-    # if keep_original_order:
-    #     picked.reverse()
     return picked
-
-# """
 
 
 def _english_description(cve_obj: Dict[str, Any]) -> str:
@@ -205,3 +197,42 @@ def to_telex_parts(items: List[Dict[str, Any]]) -> List[Dict[str, str]]:
         parts.append({"kind": "text", "text": line})
         number = number + 1
     return parts
+
+
+
+def validate_JSON_rpc_request(body):
+        if not body.get("jsonrpc"):
+            return {"error": "Invalid Request: jsonrpc is required"}
+        
+        if body.get("jsonrpc", {}) != "2.0" or "id" not in body:
+            return {"error": "Invalid Request: jsonrpc must be '2.0' and id is required"}
+            
+        return {"success": ""}
+    
+def validate_server_error(request_object, error):
+    return Response(
+        data={
+            "jsonrpc": "2.0",
+            "id": request_object.get("id", {}) if request_object.get("id", {}) else None,
+            "error": {
+                "code": -32603,
+                "message": "Internal error",
+                "data": {"details": str(error)}
+            }
+        },
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
+
+
+def get_user_request(request_object):
+    params = request_object.get("params", {})
+    message = params.get("message", {})
+    parts = message.get("parts", [])
+
+    text_value = None
+    for part in parts:
+        if part.get("kind") == "text":
+            text_value = part.get("text")
+            break
+
+    return text_value
