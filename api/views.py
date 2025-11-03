@@ -1,7 +1,5 @@
-import logging, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.views.decorators.csrf import csrf_exempt
 from .utils import randomUUID, get_latest_timestamp, online_data_grabber, filter_last_5_years_from_back, to_telex_parts, validate_JSON_rpc_request, validate_server_error, get_user_request
 from rest_framework import status
 
@@ -46,8 +44,6 @@ class HomeAPIView(APIView):
             
 
             data_result = online_data_grabber(user_request)
-            # print(data_result)
-            # print(user_request)
 
             if data_result is None:
                 return Response(
