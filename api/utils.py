@@ -32,9 +32,6 @@ def online_data_grabber(keyword):
     
 
 
-
-
-
 def five_year_cutoff(today: Optional[date | datetime] = None) -> date:
     """
     Return the calendar DATE exactly 5 years before 'today'.
@@ -167,7 +164,6 @@ def _cvss_pick(cve_obj: Dict[str, Any]) -> Tuple[Optional[float], Optional[str]]
             return float(score), str(sev)
 
     return None, None
-
 
 
 
