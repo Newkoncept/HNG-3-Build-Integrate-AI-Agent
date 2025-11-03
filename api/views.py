@@ -2,41 +2,34 @@ import logging, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
-from .utils import randomUUID, get_latest_timestamp
+from .utils import randomUUID, get_latest_timestamp, online_data_grabber, filter_last_5_years_from_back, to_telex_parts
 
-# from .data import data
+from .datas import daa
 
 # logger = logging.getLogger("a2a")
 # @csrf_exempt
 class HomeAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
-        # print(request.query_params)
-        # print(request.data)
-        # print(json.loads(request.data))
+        data_result = online_data_grabber("TP-LINK TL-WR841N")
+        # data_result = daa["vulnerabilities"][0]
+        # data_result1 = daa["vulnerabilities"][1]
+        # cve = data_result["cve"]
 
-        print(request.data["id"])
-        # print(self.request.query_params)
+        filtered_result = filter_last_5_years_from_back(data_result)
 
-        # raw = request.body.decode("utf-8", errors="replace")
+        # return Response(
+        #     filter_last_5_years_from_back(daa)
+        # )
 
-        # try:
-        #     parsed = json.loads(raw)
-        #     formatted = json.dumps(parsed, indent=2, ensure_ascii=False)
-        #     logger.info("📩 Incoming Telex Request (formatted):\n%s", formatted)
-        # except Exception:
-        #     logger.info("📩 Incoming Telex Request (raw): %s", raw)
 
-        # print(data)
-        # raw = json.loads(data["message"])
-        # formatted = json.dumps(raw, indent=2, ensure_ascii=False)
-        # raw = request.body.decode("utf-8", errors="replace")
-        # logger.info("📩 Incoming Telex Request:\nHeaders=%s\nBody=%s",
-        #             dict(request.headers), raw)
+        # print(data_result)
 
         result_id = randomUUID()
         context_Id = randomUUID()
-        agent_response = "A command injection vulnerability in the TP-Link Archer C50 allows remote attackers to execute arbitrary code via the web management interface." 
+        # agent_response = "A command injection vulnerability in the TP-Link Archer C50 allows remote attackers to execute arbitrary code via the web management interface." 
+        agent_response = to_telex_parts(filtered_result)
+
 
         data = {
             "jsonrpc": '2.0',
@@ -76,16 +69,21 @@ class HomeAPIView(APIView):
                         ]
                     }
                 ],
-                "history": [],
+                "history": request.data["params"]["message"],
                 "kind": 'task'
             }   
         }
 
 
-        return Response(
-            data
-        )
+        # return Response(
+        #     {
+        #         "one": data_result,
+        #         "two": data_result1
+                
+        #     }
+        # )
 
+        return Response(data)
 
 
 
