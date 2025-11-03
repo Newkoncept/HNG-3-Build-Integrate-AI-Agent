@@ -2,6 +2,7 @@ import logging, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+from .utils import randomUUID, get_latest_timestamp
 
 # from .data import data
 
@@ -32,6 +33,64 @@ class HomeAPIView(APIView):
         # raw = request.body.decode("utf-8", errors="replace")
         # logger.info("📩 Incoming Telex Request:\nHeaders=%s\nBody=%s",
         #             dict(request.headers), raw)
+
+        result_id = randomUUID()
+        context_Id = randomUUID()
+        agent_response = "A command injection vulnerability in the TP-Link Archer C50 allows remote attackers to execute arbitrary code via the web management interface." 
+
+        data = {
+            "jsonrpc": '2.0',
+            "id": request.data["id"],
+            "result": {
+                "id": result_id,
+                "contextId": context_Id,
+                "status": 
+                {
+                    "state": 'completed',
+                    "timestamp": get_latest_timestamp(),
+                    "message": {
+                        "messageId": randomUUID(),
+                        "role": 'agent',
+                        "parts": 
+                            [
+                                { 
+                                    "kind": 'text', 
+                                    "text": agent_response,
+                                }
+                            ],
+                        "kind": 'message',
+                        "taskId": randomUUID()
+                    }
+                },
+                
+                "artifacts":
+                [
+                    {
+                        "artifactId": randomUUID(),
+                        "name": 'deviceShield',
+                        "parts": [
+                            {
+                            "kind": "text",
+                            "text": agent_response,
+                            }
+                        ]
+                    }
+                ],
+                "history": [],
+                "kind": 'task'
+            }   
+        }
+
+
+        return Response(
+            data
+        )
+
+
+
+
+
+
 
         return Response(
             {
