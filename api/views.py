@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from .utils import randomUUID, get_latest_timestamp, online_data_grabber, filter_last_5_years_from_back, to_telex_parts
 
-from .datas import daa
+# from .datas import daa
 
 # logger = logging.getLogger("a2a")
 # @csrf_exempt
