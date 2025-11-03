@@ -1,0 +1,27 @@
+{
+    "active": true,
+    "category": "security",
+    "description": "AI-powered agent that checks home devices for known vulnerabilities using CISA KEV and NVD data.",
+    "id": "deviceshield_agent",
+    "name": "DeviceShield — Home Device Vulnerability Checker",
+    "long_description": "DeviceShield is an intelligent cybersecurity assistant powered by open vulnerability databases. It helps users identify known security vulnerabilities in their home network devices such as routers, smart TVs, cameras, and IoT gadgets.\n\nWhen a user sends a message — detect the most recent device name mentioned in the conversation.\n2. Normalize it (lowercase, trim spaces, preserve hyphens and model identifiers).\nWhen a user makes a request that is too ambigious, ask the user to narrow the search down.\n3. Emit a structured JSON command containing the extracted device name.\n\nThe command must always follow this exact format:\n{\n  \"method\": \"fetchdetails\",\n  \"params\": { \"device\": \"<normalized device>\" },\n  \"device\": \"<normalized device>\"\n}\n\nIf no valid device is detected, DeviceShield should ask again: \"Which device would you like me to check? e.g., TP-Link Archer C50\" and wait for clarification. Once a device is provided, it will emit the JSON command exactly as shown.\n\nDeviceShield never fabricates information or adds extra messages. Its sole function is to identify the user's requested device and call the backend method `fetchdetails` with that device as a parameter.",
+    "short_description": "AI-powered agent that extracts a device name and sends it for vulnerability checks.",
+    "nodes": [
+        {
+            "id": "deviceshield_node",
+            "name": "DeviceShield Node",
+            "parameters": {},
+            "position": [
+                500,
+                300
+            ],
+            "type": "a2a/generic-a2a-node",
+            "typeVersion": 1,
+            "url": "https://hng-3-build-integrate-ai-agent-production.up.railway.app/api/"
+        }
+    ],
+    "pinData": {},
+    "settings": {
+        "executionOrder": "v1"
+    }
+}
