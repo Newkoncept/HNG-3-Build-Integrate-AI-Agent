@@ -44,7 +44,6 @@ class HomeAPIView(APIView):
                     }
                 ],
                 "history": [],
-                # "history": [request.data["params"]["message"]["parts"]],
                 "kind": 'task'
             }   
         }

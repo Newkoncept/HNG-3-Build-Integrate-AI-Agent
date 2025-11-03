@@ -172,6 +172,7 @@ def to_telex_parts(items: List[Dict[str, Any]]) -> List[Dict[str, str]]:
     Convert CVE objects into Telex 'parts' text entries (one dict per vulnerability).
     """
     parts: List[Dict[str, str]] = []
+    number = 1
     for item in items:
         cve = item.get("cve") or {}
         cve_id = cve.get("id") or "Unknown CVE"
@@ -190,15 +191,17 @@ def to_telex_parts(items: List[Dict[str, Any]]) -> List[Dict[str, str]]:
         #         kev_note += f"\n• Action: {kev_required}"
 
         line = (
-            f"{cve_id}"
+            f"{number} {cve_id}"
             f"\n• Severity: {sev or 'N/A'} ({'' if score is None else score})"
             # f"\n• Published: {published.isoformat() if published else 'N/A'}"
             f"\n• Published: {published if published else 'N/A'}"
             # f"\n• Last Modified: {last_mod.isoformat() if last_mod else 'N/A'}"
             f"\n• Last Modified: {last_mod if last_mod else 'N/A'}"
             f"\n• Summary: {desc or 'No English summary available.'}"
+            f"\n\n\n"
             # f"{kev_note}"
         )
 
         parts.append({"kind": "text", "text": line})
+        number = number + 1
     return parts
