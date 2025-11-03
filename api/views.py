@@ -44,13 +44,7 @@ class HomeAPIView(APIView):
                     "message": {
                         "messageId": randomUUID(),
                         "role": 'agent',
-                        "parts": 
-                            [
-                                { 
-                                    "kind": 'text', 
-                                    "text": agent_response,
-                                }
-                            ],
+                        "parts": agent_response,
                         "kind": 'message',
                         "taskId": randomUUID()
                     }
