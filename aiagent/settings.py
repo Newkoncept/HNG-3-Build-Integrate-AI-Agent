@@ -76,9 +76,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'aiagent.wsgi.application'
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_ROUTER_TRAILING_SLASH': False,
-# }
+
+REST_FRAMEWORK = {
+    'DEFAULT_ROUTER_TRAILING_SLASH': False,
+}
 
 
 # Database

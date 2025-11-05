@@ -11,14 +11,10 @@ def randomUUID():
     return str(uuid4())
 
 
-
-
 def get_latest_timestamp():
     # get current datetime in UTC
-    dt = datetime.now(timezone.utc)
-    return dt.isoformat(timespec="milliseconds").replace("+00:00", "Z")
-
-
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    
 
 def online_data_grabber(keyword):
     url_base = 'https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch='
@@ -28,9 +24,9 @@ def online_data_grabber(keyword):
         response = requests.get(external_api_url, timeout=(5))
         response.raise_for_status()
 
-        return response.json()        
+        return [response.json()]
     except Exception as e:
-        return None, e
+        return [None, str(e)]
     
 
 
@@ -48,7 +44,6 @@ def five_year_cutoff(today: Optional[date | datetime] = None) -> date:
     
     return date(y, m, day)
         
-
 
 def parse_nvd_datetime(dt_str: str) -> datetime:
     """
@@ -69,7 +64,7 @@ def parse_nvd_datetime(dt_str: str) -> datetime:
 
 
 # def filter_last_5_years_from_back(data: dict, keep_original_order: bool = True) -> list[dict]:
-def filter_last_5_years_from_back(data: dict) -> list[dict]:
+def filter_last_5_years_from_most_recent_vuln(data: dict) -> list[dict]:
     """
     data: full NVD response dict with key "vulnerabilities".
     Walks from the END (newest first) and stops at first out-of-range item.
@@ -78,7 +73,7 @@ def filter_last_5_years_from_back(data: dict) -> list[dict]:
     If keep_original_order is True, results are returned oldest->newest (as in the input).
     Otherwise, they are returned newest->oldest (as encountered walking backwards).
     """
-    
+
     vulns = data.get("vulnerabilities", [])
     if not vulns:
         return []
@@ -201,27 +196,13 @@ def to_telex_parts(items: List[Dict[str, Any]]) -> List[Dict[str, str]]:
 
 
 def validate_JSON_rpc_request(body):
-        if not body.get("jsonrpc"):
+        if not body.get("jsonrpc", {}):
             return {"error": "Invalid Request: jsonrpc is required"}
         
         if body.get("jsonrpc", {}) != "2.0" or "id" not in body:
             return {"error": "Invalid Request: jsonrpc must be '2.0' and id is required"}
             
         return {"success": ""}
-    
-def validate_server_error(request_object, error):
-    return Response(
-        data={
-            "jsonrpc": "2.0",
-            "id": request_object.get("id", {}) if request_object.get("id", {}) else None,
-            "error": {
-                "code": -32603,
-                "message": "Internal error",
-                "data": {"details": str(error)}
-            }
-        },
-        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-    )
 
 
 def get_user_request(request_object):
@@ -236,3 +217,64 @@ def get_user_request(request_object):
             break
 
     return text_value
+
+
+def build_error_message(err_msg):
+    return [
+        {
+            "kind": "text",
+            "text": err_msg
+        }
+    ]
+
+
+# ------------ JSON-RPC helpers ------------
+def rpc_success(id_, agent_response):
+    return {
+        "jsonrpc": '2.0',
+        "id": id_,
+        "result": 
+            {
+                "id": randomUUID(),
+                "contextId": randomUUID(),
+                "status": 
+                {
+                    "state": "completed",
+                    "timestamp": get_latest_timestamp(),
+                    "message": {
+                        "messageId": randomUUID(),
+                        "role": 'agent',
+                        "parts": agent_response,
+                        "kind": 'message',
+                        "taskId": randomUUID()
+                    }
+                },
+                
+                "artifacts":
+                [
+                    {
+                        "artifactId": randomUUID(),
+                        "name": 'deviceShield',
+                        "parts": agent_response
+                    }
+                ],
+                "history": [],
+                "kind": 'task'
+            }  
+
+    }
+
+
+def rpc_error(id_, code: int, message: str, data: Any = None) -> dict:
+    err = {
+        "code": code, 
+        "message": message
+    }
+    if data is not None:
+        err["data"] = data
+    
+    return {
+        "jsonrpc": "2.0", 
+        "id": id_, 
+        "error": err
+    }
