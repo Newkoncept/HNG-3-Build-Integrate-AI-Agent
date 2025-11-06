@@ -29,7 +29,6 @@ def online_data_grabber(keyword):
         return [None, str(e)]
     
 
-
 def five_year_cutoff(today: Optional[date | datetime] = None) -> date:
     """
     Return the calendar DATE exactly 5 years before 'today'.
@@ -63,7 +62,7 @@ def parse_nvd_datetime(dt_str: str) -> datetime:
     return dt.date()
 
 
-# def filter_last_5_years_from_back(data: dict, keep_original_order: bool = True) -> list[dict]:
+
 def filter_last_5_years_from_most_recent_vuln(data: dict) -> list[dict]:
     """
     data: full NVD response dict with key "vulnerabilities".
@@ -154,7 +153,7 @@ def _cvss_pick(cve_obj: Dict[str, Any]) -> Tuple[Optional[float], Optional[str]]
 
 
 
-def to_telex_parts(items: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+def to_telex_parts(user_request: str, items: List[Dict[str, Any]]) -> List[Dict[str, str]]:
     """
     Convert CVE objects into Telex 'parts' text entries (one dict per vulnerability).
     """
@@ -178,19 +177,23 @@ def to_telex_parts(items: List[Dict[str, Any]]) -> List[Dict[str, str]]:
         #         kev_note += f"\n• Action: {kev_required}"
 
         line = (
-            f"{number} {cve_id}"
-            f"\n• Severity: {sev or 'N/A'} ({'' if score is None else score})"
+            f"{number}.  {cve_id}"
+            f"\n•  Severity: {sev or 'N/A'} ({'' if score is None else score})"
             # f"\n• Published: {published.isoformat() if published else 'N/A'}"
-            f"\n• Published: {published if published else 'N/A'}"
+            f"\n•  Published: {published if published else 'N/A'}"
             # f"\n• Last Modified: {last_mod.isoformat() if last_mod else 'N/A'}"
-            f"\n• Last Modified: {last_mod if last_mod else 'N/A'}"
-            f"\n• Summary: {desc or 'No English summary available.'}"
-            f"\n\n\n"
+            f"\n•  Last Modified: {last_mod if last_mod else 'N/A'}"
+            f"\n•  Summary: {desc or 'No English summary available.'}"
+            f"\n\n"
             # f"{kev_note}"
         )
 
         parts.append({"kind": "text", "text": line})
         number = number + 1
+
+    if len(parts) > 0:
+        brief_request_info = f"Showing the vulnerability for {user_request} in the last 5 years\nThe total vulneraibility count is {len(parts)}\n"
+        parts.insert(0, {"kind": "text", "text": brief_request_info})
     return parts
 
 

@@ -63,7 +63,7 @@ class HomeAPIView(APIView):
 
 
             
-            agent_response = to_telex_parts(filtered_result)
+            agent_response = to_telex_parts(user_request, filtered_result)
             data = rpc_success(request_id, agent_response)
 
             return Response(data, status=status.HTTP_200_OK)
